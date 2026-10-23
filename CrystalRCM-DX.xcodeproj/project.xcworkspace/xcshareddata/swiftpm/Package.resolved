@@ -1,0 +1,15 @@
+{
+  "originHash" : "13966806771cfb281c86e1ff288bf16636c60187bacefe2663534841ad8e4151",
+  "pins" : [
+    {
+      "identity" : "usbdeviceswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Arti3DPlayer/USBDeviceSwift.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "b26a0b4b3f9230ac767eee248e31706f7949a143"
+      }
+    }
+  ],
+  "version" : 3
+}

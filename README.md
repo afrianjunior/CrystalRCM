@@ -6,8 +6,6 @@ It uses native IO libraries, so doesn't require any external downloads.
 
 All credit to Qyriad who made the [original launcher](https://github.com/Qyriad/fusee-launcher) (dead link) - this is just a Swift translation :-).
 
-**note**  there has been a report that paths containing spaces are problematic - apologies for this, will be fixed asap, but in the meantime if you experience this, ensure the payload is not in any folder containing spaces
-
 
 ## Usage
 
@@ -23,15 +21,15 @@ Please follow the above instructions if you cannot open the app.
 
 ![](ss1.png)
 
-Select a payload, and then press 'push'. You can also optionally automatically push on USB connection. A future release will allow the app to run in the background.
+Drag and drop a `.bin` payload into the window, or click Browse. You can also pick from recently used payloads. Once a payload is selected and your Switch is detected in RCM, click "Inject Payload" (or enable automatic injection on USB connection).
 
-The "Push!" button will be disabled if no payload is selected, or if a device in RCM is not detected. To force an attempt, hold shift, which will temporarily override and enable the push button.
+The inject button is disabled until an RCM device and payload are ready. If you need to force an attempt without device detection, hold Shift to enable "Force Inject Payload".
 
 Please note - the app may not work unless you move it outside of the distribution .dmg.
 
 ## Building
 
-Currently, it will be a bit annoying to build as there are some hardcoded paths in the Xcode project. However, other than that, it should be as simple as opening the project in Xcode and building for yourself.
+Open `CrystalRCM-DX.xcodeproj` in Xcode and hit build. Dependencies (USBDeviceSwift) are resolved automatically through Swift Package Manager.
 
 ## How to create (old)
 

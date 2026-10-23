@@ -22,6 +22,32 @@ enum NXPayload: Int {
     case briccmii = 3
     case lockpick = 4
     case generic = 5
+    
+    var title: String {
+        switch self {
+        case .fusee: return "Atmosphere (Fusee)"
+        case .hekate: return "Hekate (ctcaer)"
+        case .rei: return "ReiNX"
+        case .briccmii: return "Briccmii"
+        case .lockpick: return "Lockpick_RCM"
+        case .generic: return "Generic ARM Payload"
+        }
+    }
+    
+    var isDangerous: Bool {
+        return self == .briccmii
+    }
+    
+    var successImage: NSImage? {
+        switch self {
+        case .fusee: return C_ATMOSPHERE
+        case .hekate: return C_HEKATE
+        case .rei: return C_REI
+        case .briccmii: return C_BRICCMII
+        case .lockpick: return C_LOCKPICK
+        case .generic: return C_GENERIC
+        }
+    }
 }
 
 enum TEGRAREQUEST: UInt8 {
@@ -66,7 +92,7 @@ class TegraDevice {
         self.deviceInfo = deviceInfo
     }
     
-    private func inferPayloadType(payload: Data) -> NXPayload {
+    static func inferPayloadType(payload: Data) -> NXPayload {
         let payloadBytes = [UInt8](payload)
         
         if payloadBytes.count < 5 {
@@ -75,8 +101,6 @@ class TegraDevice {
         
         let header = Array(payloadBytes.prefix(5))
         
-        // constants which identify payloads so we can show a
-        // nice little graphic
         let atmosphere: [UInt8] = [0xdf, 0xf0, 0x2f, 0xe3, 0x90]
         let hekateOrLockpick: [UInt8] = [0x08, 0x00, 0x4f, 0xe2, 0x70]
         let briccmii: [UInt8] = [0x00, 0x00, 0xa0, 0xe1, 0x00]
@@ -85,11 +109,11 @@ class TegraDevice {
         
         switch header {
         case atmosphere:
-            return .fusee;
+            return .fusee
         case rei:
-            return .rei;
+            return .rei
         case briccmii:
-            return .briccmii;
+            return .briccmii
         case hekateOrLockpick:
             if payloadBytes.count >= switchbrewString.count {
                 for i in 0...(payloadBytes.count - switchbrewString.count) {
@@ -99,9 +123,9 @@ class TegraDevice {
                     }
                 }
             }
-            return .lockpick;
+            return .lockpick
         default:
-            return .generic;
+            return .generic
         }
     }
     
@@ -152,7 +176,7 @@ class TegraDevice {
         var score: Int32 = 0
         var plugInInterfacePtrPtr: UnsafeMutablePointer<UnsafeMutablePointer<IOCFPlugInInterface>?>?
         
-        kr = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterfacePtrPtr, &score)
+        kr = IOCreatePlugInInterfaceForService(usbInterface, get_kIOUSBInterfaceUserClientTypeID()?.takeUnretainedValue(), kIOCFPlugInInterfaceID, &plugInInterfacePtrPtr, &score)
         IOObjectRelease(usbInterface)
         
         if kr != kIOReturnSuccess { throw TegraDeviceError.IoIfaceNotFound(step: "IOCreatePlugInInterfaceForService", code: kr) }
@@ -166,7 +190,7 @@ class TegraDevice {
         
         kr = withUnsafeMutablePointer(to: &interfacePtrPtr) {
             $0.withMemoryRebound(to: Optional<LPVOID>.self, capacity: 1) {
-                plugInInterface.QueryInterface(plugInInterfacePtrPtr, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID), $0)
+                plugInInterface.QueryInterface(plugInInterfacePtrPtr, get_kIOUSBInterfaceInterfaceIDBytes(), $0)
             }
         }
         
@@ -297,14 +321,16 @@ class TegraDevice {
             wValue: 0,
             wIndex: 0,
             wLength: UInt16(length),
-            pData: &responseData,
+            pData: nil,
             wLenDone: 0,
             noDataTimeout: 1000,
             completionTimeout: 1000
         )
         
-        let kr = deviceInterface.DeviceRequestTO(self.deviceInfo.deviceInterfacePtrPtr, &request)
-        
+        let kr = responseData.withUnsafeMutableBytes { bufPtr in
+            request.pData = bufPtr.baseAddress
+            return deviceInterface.DeviceRequestTO(self.deviceInfo.deviceInterfacePtrPtr, &request)
+        }
         print("[debug] DeviceRequestTO returned kr=\(kr) (0x\(String(kr, radix: 16)))")
         
         if kr != kIOReturnSuccess {
@@ -324,7 +350,7 @@ class TegraDevice {
         print("[debug] Starting payload push process...")
         print("[debug] Payload size: \(payloadData.count) bytes")
         
-        let payloadType = inferPayloadType(payload: payloadData)
+        let payloadType = TegraDevice.inferPayloadType(payload: payloadData)
         NotificationCenter.default.post(name: .PayloadTypeDetected, object: payloadType.rawValue)
         setProgressTo(progress: 10.0)
         
@@ -345,7 +371,7 @@ class TegraDevice {
         payload += withUnsafeBytes(of: UInt32(MAX_PAYLOAD_LENGTH).littleEndian) { Array($0) }
         payload += [UInt8](repeating: 0, count: 680 - payload.count)
         payload += [UInt8](intermezzoData)
-        
+        let intermezzoSize = intermezzoData.count
         let currentOffset = RCM_PAYLOAD_ADDR + UInt32(intermezzoSize)
         let paddingToPayloadStart = Int(PAYLOAD_START_ADDR - currentOffset)
         payload += [UInt8](repeating: 0, count: paddingToPayloadStart)
@@ -363,8 +389,8 @@ class TegraDevice {
         payload += [UInt8](repeating: 0, count: 0x1000 - (payload.count % 0x1000))
         
         setProgressTo(progress: 40.0)
-        if payload.count > length {
-            let sizeOver = payload.count - length
+        if payload.count > MAX_PAYLOAD_LENGTH {
+            let sizeOver = payload.count - MAX_PAYLOAD_LENGTH
             print("[error] Payload is too large to be submitted via RCM. (\(sizeOver) bytes larger than max).")
             throw TegraDeviceError.OversizedPayload(bytesOver: sizeOver)
         }
@@ -389,8 +415,8 @@ class TegraDevice {
     
     deinit {
         if let interfaceInterface = self.interface?.pointee?.pointee {
-            interfaceInterface.USBInterfaceClose(self.interface)
-            interfaceInterface.Release(self.interface)
+            _ = interfaceInterface.USBInterfaceClose(self.interface)
+            _ = interfaceInterface.Release(self.interface)
         }
     }
 }

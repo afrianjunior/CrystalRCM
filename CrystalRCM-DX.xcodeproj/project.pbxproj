@@ -242,7 +242,7 @@
 			);
 			mainGroup = 4DC4411627A4026E00CE0821;
 			packageReferences = (
-				61988F4D2E969F3F0056E552 /* XCLocalSwiftPackageReference "../Downloads/USBDeviceSwift-master" */,
+				61988F4D2E969F3F0056E552 /* XCRemoteSwiftPackageReference "USBDeviceSwift" */,
 			);
 			productRefGroup = 4DC4412027A4026E00CE0821 /* Products */;
 			projectDirPath = "";
@@ -490,7 +490,6 @@
 					"\"$(SRCROOT)/CrystalRCM-DX.xcodeproj\"/**",
 					"/opt/local/include/libusb-1.0/**",
 				);
-				INFOPLIST_FILE = "CrystalRCM-DX/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CrystalRCM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -509,7 +508,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = cafe.moya.CrystalRCM;
 				PRODUCT_NAME = CrystalRCM;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/prayerie/crystalrcm-dx/CrystalRCM-DX-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/CrystalRCM-DX-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/CrystalRCM-DX.xcodeproj\"/**",
@@ -532,7 +531,6 @@
 					"\"$(SRCROOT)/CrystalRCM-DX.xcodeproj\"/**",
 					"/opt/local/include/libusb-1.0/**",
 				);
-				INFOPLIST_FILE = "CrystalRCM-DX/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CrystalRCM;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -550,7 +548,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = cafe.moya.CrystalRCM;
 				PRODUCT_NAME = CrystalRCM;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/prayerie/crystalrcm-dx/CrystalRCM-DX-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/CrystalRCM-DX-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/CrystalRCM-DX.xcodeproj\"/**",
@@ -668,19 +666,23 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		61988F4D2E969F3F0056E552 /* XCLocalSwiftPackageReference "../Downloads/USBDeviceSwift-master" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/USBDeviceSwift-master";
+/* Begin XCRemoteSwiftPackageReference section */
+		61988F4D2E969F3F0056E552 /* XCRemoteSwiftPackageReference "USBDeviceSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Arti3DPlayer/USBDeviceSwift.git";
+			requirement = {
+				kind = branch;
+				branch = master;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		61988F4E2E969F3F0056E552 /* USBDeviceSwift */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 61988F4D2E969F3F0056E552 /* XCRemoteSwiftPackageReference "USBDeviceSwift" */;
 			productName = USBDeviceSwift;
 		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4DC4411727A4026E00CE0821 /* Project object */;
 }
